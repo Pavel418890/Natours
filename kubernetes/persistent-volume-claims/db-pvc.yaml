@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc
+  labels:
+    app: natours
+    role: db
+    tier: backend
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: "db-sc"
+  resources:
+    requests:
+      storage: 10Gi

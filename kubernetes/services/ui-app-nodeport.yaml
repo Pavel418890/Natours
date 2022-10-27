@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ui-app-nodeport
+  labels:
+    app: natours
+    role: ui-app
+    tier: frontend
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+
+  selector:
+    app: natours
+    role: ui-app
+    tier: frontend

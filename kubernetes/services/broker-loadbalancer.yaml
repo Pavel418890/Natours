@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: broker-loadbalancer
+  labels:
+    app: natours
+    role: broker
+    tier: backend
+spec:
+  externalName: rabbitmq
+  ports:
+    - targetPort: 15672
+      port: 15672
+
+  type: LoadBalancer
+
+  selector:
+    app: natours
+    role: broker
+    tier: backend

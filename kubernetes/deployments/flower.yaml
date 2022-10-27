@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flower
+  labels:
+    app: natours
+    role: tasks-monitoring
+    tier: monitoring
+spec:
+  template:
+    metadata:
+      name: flower-pod
+      labels:
+        app: natours
+        role: tasks-monitoring
+        tier: monitoring
+    spec:
+      containers:
+        - name: flower-container
+          image: plots418890/natours_backend:latest
+          imagePullPolicy: Always
+          command: ['/home/app/src/commands/entrypoint.flower.sh']
+          envFrom:
+            - configMapRef:
+                name: webserver-cm
+            - secretRef:
+                name: webserver-secret
+          ports:
+            - containerPort: 5555
+
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: natours
+      role: tasks-monitoring
+      tier: monitoring

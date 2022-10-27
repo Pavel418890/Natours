@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media-storage-pv
+  labels:
+    app: natours
+    role: media-disk
+    tier: file-storage
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 10Gi
+  nfs:
+    path: '/'
+    server: media-storage.default.svc.cluster.local

@@ -1,0 +1,9 @@
+apiVersion: networking.gke.io/v1beta2
+kind: ManagedCertificate
+metadata:
+  name: managed-cert
+spec:
+  domains:
+    - natours-club.site
+    - www.natours-club.site
+    - api.natours-club.site

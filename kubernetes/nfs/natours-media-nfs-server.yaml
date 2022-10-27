@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: media-storage
+spec:
+  template:
+    metadata:
+      labels:
+        app: natours
+        role: media-disk
+        tier: file-storage
+    spec:
+      containers:
+        - name: natours-media-nfs-container
+          image: gcr.io/google_containers/volume-nfs:0.8
+          ports:
+            - name: nfs
+              containerPort: 2049
+            - name: mountd
+              containerPort: 20048
+            - name: rpcbind
+              containerPort: 111
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /exports
+              name: media-storage-pvc
+      volumes:
+        - name: media-storage-pvc
+          gcePersistentDisk:
+            pdName: gce-media-nfs
+            fsType: ext4
+
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: natours
+      role: media-disk
+      tier: file-storage

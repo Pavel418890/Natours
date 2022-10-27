@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broker
+  labels:
+    app: natours
+    role: broker
+    tier: backend
+spec:
+  template:
+    metadata:
+      name: broker-pod
+      labels:
+        app: natours
+        role: broker
+        tier: backend
+    spec:
+      containers:
+        - name: broker-container
+          image: rabbitmq:3-management-alpine
+          envFrom:
+            - secretRef:
+                name: broker-secret
+          ports:
+            - containerPort: 5672
+
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: natours
+      role: broker
+      tier: backend

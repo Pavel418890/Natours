@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.allow-http: "false"
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: natours-static-ip
+    networking.gke.io/managed-certificates: managed-cert
+  name: ingress
+
+spec:
+  defaultBackend:
+    service:
+      name: ui-app-nodeport
+      port:
+        number: 80
+
+  rules:
+    - host: www.natours-club.site
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            path: /*
+            backend:
+              service:
+                name: ui-app-nodeport
+                port:
+                  number: 80
+
+    - host: api.natours-club.site
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            path: /*
+            backend:
+              service:
+                name: reverseproxy-nodeport
+                port:
+                  number: 80

@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: natours
+    role: webserver
+    tier: backend
+  name: webserver
+spec:
+  template:
+
+    metadata:
+      labels:
+        app: natours
+        role: webserver
+        tier: backend
+      name: webserver
+    spec:
+      initContainers:
+        - name: grant-permissions
+          image: busybox
+          command: ['chown']
+          args: ['-R', '1000:1000', '/home/app/src/media', '/home/app/src/static']
+          volumeMounts:
+            - mountPath: /home/app/src/media
+              name: media-storage
+            - mountPath: /home/app/src/static
+              name: static-storage
+      containers:
+      - name: webserver-container
+        image: plots418890/natours_backend:latest
+        imagePullPolicy: Always
+        command: ["/home/app/src/commands/entrypoint.sh"]
+        env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+        envFrom:
+          - configMapRef:
+              name: webserver-cm
+          - secretRef:
+              name: webserver-secret
+        ports:
+          - containerPort: 8888
+        readinessProbe:
+          httpGet:
+            path: /healthz/
+            port: 8888
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+        livenessProbe:
+          httpGet:
+            path: /healthz/
+            port: 8888
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+
+        volumeMounts:
+          - mountPath: /home/app/src/media
+            name: media-storage
+          - mountPath: /home/app/src/static
+            name: static-storage
+      volumes:
+        - name: media-storage
+          persistentVolumeClaim:
+            claimName: media-storage-pvc
+        - name: static-storage
+          persistentVolumeClaim:
+            claimName: static-storage-pvc
+
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: natours
+      role: webserver
+      tier: backend

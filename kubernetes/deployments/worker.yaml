@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  labels:
+    app: natours
+    role: worker
+    tier: backend
+spec:
+  template:
+    metadata:
+      name: worker-pod
+      labels:
+        app: natours
+        role: worker
+        tier: backend
+    spec:
+      containers:
+        - name: worker-container
+          image: plots418890/natours_backend:latest
+          imagePullPolicy: Always
+          command: ['/home/app/src/commands/entrypoint.celery.sh']
+          ports:
+            - containerPort: 8888
+          envFrom:
+            - configMapRef:
+                name: webserver-cm
+            - secretRef:
+                name: webserver-secret
+
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: natours
+      role: worker
+      tier: backend

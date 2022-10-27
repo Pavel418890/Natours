@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  labels:
+    app: natours
+    role: db
+    tier: backend
+
+spec:
+  template:
+    metadata:
+      labels:
+        app: natours
+        role: db
+        tier: backend
+      name: db-pod
+    spec:
+      containers:
+        - name: db-container
+          image: postgres:13-alpine3.13
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: db-cm
+            - secretRef:
+                name: db-secret
+          ports:
+            - containerPort: 5432
+          livenessProbe:
+            exec:
+              command: [
+                  "psql", "-U", "postgres",
+                  "-d", "natours",
+                  "-c", "SELECT 1"
+              ]
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 2
+          readinessProbe:
+            exec:
+              command: [
+                  "psql", "-U", "postgres",
+                  "-d", "natours",
+                  "-c", "SELECT 1"
+              ]
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 2
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: db-sc
+
+      volumes:
+        - name: db-sc
+          persistentVolumeClaim:
+            claimName: db-pvc
+
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: natours
+      role: db
+      tier: backend

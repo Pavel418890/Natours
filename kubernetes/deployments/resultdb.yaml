@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resultdb
+  labels:
+    app: natours
+    role: result-backend
+    tier: backend
+spec:
+  template:
+    metadata:
+      name: resultdb-pod
+      labels:
+        app: natours
+        role: result-backend
+        tier: backend
+    spec:
+      containers:
+        - name: resultdb-container
+          image: redis:7.0-rc-alpine
+          command: ['redis-server']
+          ports:
+            - containerPort: 6379
+
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: natours
+      role: result-backend
+      tier: backend

@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reverseproxy-cm
+  labels:
+    app: natours
+    role: reverseproxy 
+    tier: backend
+
+data:
+  nginx.conf: |
+    # quantity worker process as much cpu cores
+    worker_processes auto;
+    events {
+      worker_connections 1024; # increase if you have lots of clients
+      accept_mutex on; # set to 'on' if nginx worker_processes > 1
+    }
+
+    http {
+      include mime.types;
+      # fallback in case we can't determine a type
+      default_type application/octet-stream;
+      sendfile on;
+
+      upstream natours-club {
+       server webserver-clusterip:8888;
+      }
+      server {
+        listen 80;
+
+        client_max_body_size 10M;
+        client_header_buffer_size 1k;
+        client_body_timeout 12;
+        client_header_timeout 12;
+        keepalive_timeout 5;
+        sendfile on; # skip buffering for received files
+        tcp_nopush on; # optimise sendfile packets
+        # path for static files
+
+
+        location /media/ {
+          alias /home/app/src/media/;
+        }
+
+        location /static/ {
+          alias /home/app/src/static/;
+        }
+
+        location / {
+          proxy_pass http://natours-club;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header Host $host;
+          proxy_redirect off;
+        }
+        location /healthz/ {
+          return 200;
+        }
+      }
+    }

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: natours
+    role: ui-app
+    tier: frontend
+  name: ui-app
+spec:
+  template:
+    metadata:
+      labels:
+        app: natours
+        role: ui-app
+        tier: frontend
+      name: ui-app-pod
+    spec:
+      containers:
+      - image: plots418890/natours_frontend:latest
+        imagePullPolicy: Always
+        name: ui-app-container
+        ports:
+          - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: readyz/
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+        livenessProbe:
+          httpGet:
+            path: livez/
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: natours
+      role: ui-app
+      tier: frontend

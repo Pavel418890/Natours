@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reverseproxy
+  labels:
+    app: natours
+    role: reverseproxy
+    tier: backend
+
+spec:
+  template:
+    metadata:
+      name: reverseproxy-pod
+      labels:
+        app: natours
+        role: reverseproxy
+        tier: backend
+
+    spec:
+      containers:
+        - name: reverseproxy-container
+          image: nginx:1.21.6-alpine
+          readinessProbe:
+            httpGet:
+              port: 80
+              path: /healthz/
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              port: 80
+              path: /healthz/
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: /etc/nginx/nginx.conf
+              name: reverseproxy-cm
+              subPath: nginx.conf
+              readOnly: true
+            - mountPath: /home/app/src/media
+              name: media-storage
+            - mountPath: /home/app/src/static
+              name: static-storage
+
+      volumes:
+        - name: media-storage
+          persistentVolumeClaim:
+            claimName: media-storage-pvc
+        - name: static-storage
+          persistentVolumeClaim:
+            claimName: static-storage-pvc
+        - name: reverseproxy-cm
+          configMap:
+            name: reverseproxy-cm
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+
+
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: natours
+      role: reverseproxy
+      tier: backend

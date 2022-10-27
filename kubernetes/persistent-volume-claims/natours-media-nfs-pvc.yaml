@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-storage-pvc
+  labels:
+    app: natours
+    role: media-disk
+    tier: file-storage
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+
+  resources:
+    requests:
+      storage: 10Gi
+
+  selector:
+    matchLabels:
+      app: natours
+      role: media-disk
+      tier: file-storage
