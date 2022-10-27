@@ -1,8 +1,12 @@
 [submodule "backend"]
 	path = backend
 	url = https://github.com/Pavel418890/natours-backend.git
-	branch = deploy
+	branch = master
 [submodule "frontend"]
 	path = frontend
 	url = https://github.com/Pavel418890/natours-frontend.git
-	branch = deploy
+	branch = master
+[submodule "./backend/"]
+	branch = master
+[submodule "./frontend/"]
+	branch = master
