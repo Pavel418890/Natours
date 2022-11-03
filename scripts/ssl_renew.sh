@@ -1,5 +1,5 @@
-RPOJECT_PATH=/usr/src/natours
-DOMAIN=natours-club.site
+export PROJECT_PATH=/usr/src/natours
+export DOMAIN=natours-club.site
 DOCKER="/usr/bin/docker"
 
 cd $PROJECT_PATH

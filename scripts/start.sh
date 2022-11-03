@@ -2,8 +2,8 @@
 
 set -e 
 
-DOMAIN=natours-club.site
-PROJECT_PATH=/usr/src/natours
+export DOMAIN=natours-club.site
+export PROJECT_PATH=/usr/src/natours
 DOCKER=/usr/bin/docker
 
 $DOCKER compose build 
