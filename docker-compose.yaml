@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
   rabbit:
@@ -6,11 +6,11 @@ services:
     image: rabbitmq:3.11.2-management
     restart: on-failure
     networks:
-    - backend
+      - backend
     env_file:
-    - .envs/.env
+      - .envs/.env
     ports:
-    - 15672:15672
+      - 15672:15672
 
   pg:
     build:
@@ -18,77 +18,77 @@ services:
     image: plots418890/natours_pg:0.0.1
     container_name: pg
     networks:
-    - backend
+      - backend
     restart: on-failure
     env_file: .envs/.env.db
     volumes:
-    - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
 
   flower:
     container_name: flower
     depends_on:
-    - celeryworker
-    - rabbit
+      - celeryworker
+      - rabbit
     image: plots418890/natours_backend:0.0.1
     networks:
-    - backend
+      - backend
     restart: on-failure
-    entrypoint: ['${PROJECT_PATH?Variable not set}/commands/entrypoint.flower.sh']
+    entrypoint:
+      ["${PROJECT_PATH?Variable not set}/commands/entrypoint.flower.sh"]
     env_file:
-    - .envs/.env
+      - .envs/.env
     ports:
-    - 5555:5555
+      - 5555:5555
     volumes:
-    - backend_src:${PROJECT_PATH?Variable not set}
-
+      - backend_src:${PROJECT_PATH?Variable not set}
 
   redis:
     container_name: redis
     depends_on:
-    - rabbit
-    - backend
-    - celeryworker
-    entrypoint: [ 'redis-server' ]
+      - rabbit
+      - backend
+      - celeryworker
+    entrypoint: ["redis-server"]
     image: redis:7.0-rc-alpine
     networks:
-    - backend
+      - backend
     restart: on-failure
 
   nginx:
     container_name: nginx
     depends_on:
-    - backend
+      - backend
     image: nginx:1.22.1
     networks:
-    - backend
+      - backend
     ports:
-    - 80:80
-    - 443:443
+      - 80:80
+      - 443:443
     restart: unless-stopped
     volumes:
-    - ./nginx:/etc/nginx
-    - webroot:/var/www/html
-    - certbot_etc:/etc/letsencrypt
-    - certbot_var:/var/lib/letsencrypt
-    - dhparam:/etc/ssl/certs
-    - webserver_static:/var/www/natours-club.site/static
-    - webserver_media:/var/www/natours-club.site/media
+      - ./nginx:/etc/nginx
+      - webroot:/var/www/html
+      - certbot_etc:/etc/letsencrypt
+      - certbot_var:/var/lib/letsencrypt
+      - dhparam:/etc/ssl/certs
+      - webserver_static:/var/www/natours-club.site/static
+      - webserver_media:/var/www/natours-club.site/media
 
   certbot:
     container_name: certbot
     image: certbot/certbot
     volumes:
-    - webroot:/var/www/html
-    - certbot_etc:/etc/letsencrypt
-    - certbot_var:/var/lib/letsencrypt
+      - webroot:/var/www/html
+      - certbot_etc:/etc/letsencrypt
+      - certbot_var:/var/lib/letsencrypt
     depends_on:
-    - nginx
+      - nginx
     command: certonly --webroot --webroot-path=/var/www/html --email natourstest@mail.ru --agree-tos --force-renewal -v -d natours-club.site -d www.natours-club.site -d api.natours-club.site
     networks:
-    - backend
+      - backend
 
   backend:
-    entrypoint: [ '${PROJECT_PATH?Variable not set}/commands/entrypoint.sh' ]
+    entrypoint: ["${PROJECT_PATH?Variable not set}/commands/entrypoint.sh"]
     image: plots418890/natours_backend:0.0.1
     build:
       context: ./backend/
@@ -98,31 +98,32 @@ services:
         DOMAIN_ARG: ${DOMAIN?Variable not set}
     container_name: backend
     env_file:
-    - .envs/.env
+      - .envs/.env
     depends_on:
-    - pg
-    - rabbit
+      - pg
+      - rabbit
     networks:
-    - backend
+      - backend
     restart: on-failure
     volumes:
-    - backend_src:${PROJECT_PATH?Variable not set}
-    - webserver_static:/var/www/natours-club.site/static
-    - webserver_media:/var/www/natours-club.site/media
+      - backend_src:${PROJECT_PATH?Variable not set}
+      - webserver_static:/var/www/natours-club.site/static
+      - webserver_media:/var/www/natours-club.site/media
 
   celeryworker:
     container_name: celeryworker
-    entrypoint: [ '${PROJECT_PATH?Variable not set}/commands/entrypoint.celery.sh' ]
+    entrypoint:
+      ["${PROJECT_PATH?Variable not set}/commands/entrypoint.celery.sh"]
     env_file:
-    - .envs/.env
+      - .envs/.env
     volumes:
-    - backend_src:${PROJECT_PATH?Variable not set}
+      - backend_src:${PROJECT_PATH?Variable not set}
     depends_on:
-    - rabbit
-    - pg
+      - rabbit
+      - pg
     image: plots418890/natours_backend:0.0.1
     networks:
-    - backend
+      - backend
     restart: on-failure
 
 volumes:
@@ -133,7 +134,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ${PROJECT_PATH?Variable not set}/backend/src/ 
+      device: ${PROJECT_PATH?Variable not set}/backend/src/
       o: bind
   webserver_media:
     driver: local
@@ -162,5 +163,4 @@ volumes:
 
 networks:
   backend:
-    name: 'natours'
-    
+    name: "natours"
