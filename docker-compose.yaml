@@ -15,6 +15,7 @@ services:
   pg:
     build:
       context: ./postgres
+    image: plots418890/natours_pg:0.0.1
     container_name: pg
     networks:
     - backend
@@ -23,22 +24,22 @@ services:
     volumes:
     - pgdata:/var/lib/postgresql/data
 
-      #  flower:
-      #    container_name: flower
-      #    depends_on:
-      #    - celeryworker
-      #    - rabbit
-      #    image: plots418890/natours_backend
-      #    networks:
-      #    - backend
-      #    restart: on-failure
-      #    entrypoint: ['${PROJECT_PATH?Variable not set}/commands/entrypoint.flower.sh']
-      #    env_file:
-      #    - .envs/.env
-      #    ports:
-      #    - 5555:5555
-      #    volumes:
-      #    - backend_src:${PROJECT_PATH?Variable not set}
+  flower:
+    container_name: flower
+    depends_on:
+    - celeryworker
+    - rabbit
+    image: plots418890/natours_backend:0.0.1
+    networks:
+    - backend
+    restart: on-failure
+    entrypoint: ['${PROJECT_PATH?Variable not set}/commands/entrypoint.flower.sh']
+    env_file:
+    - .envs/.env
+    ports:
+    - 5555:5555
+    volumes:
+    - backend_src:${PROJECT_PATH?Variable not set}
 
 
   redis:
@@ -88,6 +89,7 @@ services:
 
   backend:
     entrypoint: [ '${PROJECT_PATH?Variable not set}/commands/entrypoint.sh' ]
+    image: plots418890/natours_backend:0.0.1
     build:
       context: ./backend/
       args:
@@ -100,7 +102,6 @@ services:
     depends_on:
     - pg
     - rabbit
-    image: plots418890/natours_backend
     networks:
     - backend
     restart: on-failure
@@ -119,7 +120,7 @@ services:
     depends_on:
     - rabbit
     - pg
-    image: plots418890/natours_backend
+    image: plots418890/natours_backend:0.0.1
     networks:
     - backend
     restart: on-failure
