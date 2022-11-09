@@ -46,7 +46,7 @@ _Необходимые условия:_
 
 ```shell
 git clone https://github.com/Pavel418890/natours.git
-git submodule update --remote --recursive
+git submodule update --remote --init
 ```
 
 ### Настройка переменных окружения
@@ -57,36 +57,37 @@ cp -r environment ./.envs
 
 - Заполнить файлы конфигурации `./envs/.env*` своими данными
 
-        <details><summary>`Optional` Для тестирования оплаты локально:</summary>
+<details><summary>`Optional` Для тестирования оплаты локально:</summary>
 
-        - Написать мне в телеграмм `@pavel418890` или на почту `pavel418890@gmail.com`
+- Написать мне в телеграмм `@pavel418890` или на почту `pavel418890@gmail.com`
 
-  для получения УЗ и `{{приватного ключа}}` от stripe аккаунта.
+для получения УЗ и `{{приватного ключа}}` от stripe аккаунта.
 
-        - Установить stripe [stripe-cli](https://stripe.com/docs/stripe-cli).
+- Установить stripe [stripe-cli](https://stripe.com/docs/stripe-cli).
 
-        * <sub>Аутентификация stripe-cli.</sub>
+* <sub>Аутентификация stripe-cli.</sub>
 
-        ```shell
-        stripe login
+```shell
+stripe login
 
-        ```
-        * <sub>Запуск вебхука</sub>
+```
 
-        ```shell
-        stripe listen --forward-to localhost:8000/v1/bookings/tour-booking/
+- <sub>Запуск вебхука</sub>
 
-        > OUTPUT:
-        Ready! Your webhook signing secret is '{{WEBHOOK_SIGNING_SECRET}}' (^C to quit)
-        ```
+```shell
+stripe listen --forward-to localhost:8000/v1/bookings/tour-booking/
 
-        * <sub>Вставка переменных окружения</sub>
+> OUTPUT:
+Ready! Your webhook signing secret is '{{WEBHOOK_SIGNING_SECRET}}' (^C to quit)
+```
 
-            `STRIPE_WEBHOOK_SECRET_KEY=<{{WEBHOOK_SIGNING_SECRET}}>`
+- <sub>Вставка переменных окружения</sub>
 
-            `STRIPE_PRIVATE_KEY=<{{приватный ключ}}>`
+`STRIPE_WEBHOOK_SECRET_KEY=<{{WEBHOOK_SIGNING_SECRET}}>`
 
-    </details>
+`STRIPE_PRIVATE_KEY=<{{приватный ключ}}>`
+
+</details>
 
 ### Запуск
 
