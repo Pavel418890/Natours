@@ -51,66 +51,49 @@ git submodule update --remote --recursive
 
 ### Настройка переменных окружения
 
-- _путь до переменных окружения`<path-to-natours-backend-project>/.envs/.env.dev`_
+```shell
+cp -r environment ./.envs
+```
 
-- _путь до переменных окружения DB `<path-to-natours-backend-project>/.envs/.env.db.dev`_
+- Заполнить файлы конфигурации `./envs/.env*` своими данными
 
-- Заполнить пароль для БД
+        <details><summary>`Optional` Для тестирования оплаты локально:</summary>
 
-      `DATABASE_PASSWORD=<{{любой пароль}}>`
-
-      `POSTGRES_PASSWORD={{DATABASE_PASSWORD}}`
-
-
-      <details><summary>`Optional` Для тестирования оплаты локально:</summary>
-
-      - Написать мне в телеграмм `@pavel418890` или на почту `pavel418890@gmail.com`
+        - Написать мне в телеграмм `@pavel418890` или на почту `pavel418890@gmail.com`
 
   для получения УЗ и `{{приватного ключа}}` от stripe аккаунта.
 
-      - Установить stripe [stripe-cli](https://stripe.com/docs/stripe-cli).
+        - Установить stripe [stripe-cli](https://stripe.com/docs/stripe-cli).
 
-      * <sub>Аутентификация stripe-cli.</sub>
+        * <sub>Аутентификация stripe-cli.</sub>
 
-      ```shell
-      stripe login
+        ```shell
+        stripe login
 
-      ```
-      * <sub>Запуск вебхука</sub>
+        ```
+        * <sub>Запуск вебхука</sub>
 
-      ```shell
-      stripe listen --forward-to localhost:8888/v1/bookings/tour-booking/
+        ```shell
+        stripe listen --forward-to localhost:8000/v1/bookings/tour-booking/
 
-      > OUTPUT:
-      Ready! Your webhook signing secret is '{{WEBHOOK_SIGNING_SECRET}}' (^C to quit)
-      ```
+        > OUTPUT:
+        Ready! Your webhook signing secret is '{{WEBHOOK_SIGNING_SECRET}}' (^C to quit)
+        ```
 
-      * <sub>Вставка переменных окружения</sub>
+        * <sub>Вставка переменных окружения</sub>
 
-          `STRIPE_WEBHOOK_SECRET_KEY=<{{WEBHOOK_SIGNING_SECRET}}>`
+            `STRIPE_WEBHOOK_SECRET_KEY=<{{WEBHOOK_SIGNING_SECRET}}>`
 
-          `STRIPE_PRIVATE_KEY=<{{приватный ключ}}>`
+            `STRIPE_PRIVATE_KEY=<{{приватный ключ}}>`
 
-  </details>
+    </details>
 
-### Сборка UI
-
-```shell
-./scripts/build-front.sh
-```
-
-### Запуск сервера natours-backend
+### Запуск
 
 - <sub>Переходим в директорию проекта</sub>
 
 ```shell
-cd <path-to-natours-backend-project>
-```
-
-- <sub>Запуск backend приложения</sub>
-
-```shell
-docker compose up -d
+cd ./scripts && ./start.sh
 ```
 
 ## <a id="description">Сценарий для демонстрации возможностей проекта</a>
@@ -164,27 +147,3 @@ https://documenter.getpostman.com/view/11170718/UVsPQQrd
 1. Настройка адаптивной верстки под другие устройства.
 1. Доработка всех запросов и проработка дизайна в целом. Возможно добавление фреймворка Next JS, SEO, оптимизация изображений
 1. Комментарии в клиенской части
-
-```
-
-```
-
-<h3><a id="plans">Планы по развитию проекта</a></h3>
-
-1. Написать unit тесты.
-1. Настройка CI/CD через Jenkins или Gitlab
-1. Чаты. Обмен сообщениями через websoket
-1. Разработка пространства для админа/гида
-1. Добавить систему фильтров
-1. Перенести хранение static и media файлов в Google Storage или S3. На данный момент файлы хранятся в nfs
-1. Настройка адаптивной верстки под другие устройства.
-1. Доработка всех запросов и проработка дизайна в целом. Возможно добавление фреймворка Next JS, SEO, оптимизация изображений
-1. Комментарии в клиенской части
-
-```
-
-```
-
-```
-
-```
