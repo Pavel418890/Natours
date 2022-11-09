@@ -1,5 +1,9 @@
 # Natours
 
+UI - https://www.natours-club.site
+
+API - https://api.natours-club.site
+
 ## Содержание
 
 - [Краткое описание проекта](#summary)
