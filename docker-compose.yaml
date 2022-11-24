@@ -29,7 +29,7 @@ services:
     depends_on:
       - celeryworker
       - rabbit
-    image: plots418890/natours_backend:0.0.1
+    image: plots418890/natours_backend:${BACKEND_TAG?Variable not set}
     networks:
       - backend
     restart: on-failure
@@ -89,7 +89,7 @@ services:
 
   backend:
     entrypoint: ["/usr/src/natours/commands/entrypoint.sh"]
-    image: plots418890/natours_backend:0.0.1
+    image: plots418890/natours_backend:${BACKEND_TAG?Variable not set}
     build:
       context: ./backend/
       args:
@@ -120,7 +120,7 @@ services:
     depends_on:
       - rabbit
       - pg
-    image: plots418890/natours_backend:0.0.1
+    image: plots418890/natours_backend:${BACKEND_TAG?Variable not set}
     networks:
       - backend
     restart: on-failure

@@ -1,15 +1,26 @@
 SHELL := /bin/bash
 
 natours-frontend: 
-	docker build -t frontend:build --build-arg API_URL=${API_URL} ./frontend
-	docker create --init --name=frontend-build frontend:build
+	docker build \
+		-t plots418890/natours-frontend:${FRONTEND_TAG} \
+	       	--build-arg API_URL=${API_URL} \
+		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
+		--build-arg VCS_REF=`git submodule status ./frontend | awk '{print $$1;}'` \
+	      	./frontend 
+	docker push plots418890/natours-frontend:${FRONTEND_TAG}
+	docker create --init --name=frontend-build "plots418890/natours-frontend:${FRONTEND_TAG}"
 	docker cp frontend-build:/dist ./frontend
 	docker rm -f frontend-build
 
 natours-backend:
-	docker compose -f ./backend/docker-compose.yaml build \
-	--build-arg DOMAIN=${DOMAIN} 
-	docker compose -f ./backend/docker-compose.yaml up -d
+	docker build \
+		-f backend/Dockerfile \
+		-t plots418890/natours-backend:${BACKEND_TAG} \
+		--build-arg DOMAIN=${DOMAIN} \
+		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
+		--build-arg VCS_REF=`git submodule status ./backend | awk '{print $$1;}'` \
+		./backend
+	docker push "plots418890/natours-backend:${BACKEND_TAG}"
 
 certs:
 	mkdir -p ./certs
@@ -18,8 +29,9 @@ certs:
 backend-logs:
 	docker service logs -f natours_backend
 
+# nginx server log
 access-logs:
-	docker service logs -f natours_nginx
+	tail -f api.natours-club.site.access.log	
 
 # Daily Cron job for renew ssl certs
 # crontab -e 
