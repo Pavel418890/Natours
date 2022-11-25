@@ -1,25 +1,32 @@
 SHELL := /bin/bash
+FRONTEND_TAG = `git -C ./frontend describe --tags`
+BACKEND_TAG = `git -C ./backend describe --tags`
+DOMAIN = natours-club.site
+API_URL = https://api.${DOMAIN}
 
-natours-frontend: 
+natours-frontend:
 	docker build \
+		-t plots418890/natours-frontend:latest \
 		-t plots418890/natours-frontend:${FRONTEND_TAG} \
 	       	--build-arg API_URL=${API_URL} \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
-		--build-arg VCS_REF=`git submodule status ./frontend | awk '{print $$1;}'` \
-	      	./frontend 
+		--build-arg VCS_REF=`git -C frontend rev-parse HEAD` \
+	      	frontend 
 	docker push plots418890/natours-frontend:${FRONTEND_TAG}
+	docker push plots418890/natours-frontend:latest
 	docker create --init --name=frontend-build "plots418890/natours-frontend:${FRONTEND_TAG}"
 	docker cp frontend-build:/dist ./frontend
 	docker rm -f frontend-build
 
 natours-backend:
 	docker build \
-		-f backend/Dockerfile \
+		-t plots418890/natours-backend:latest \
 		-t plots418890/natours-backend:${BACKEND_TAG} \
 		--build-arg DOMAIN=${DOMAIN} \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
-		--build-arg VCS_REF=`git submodule status ./backend | awk '{print $$1;}'` \
-		./backend
+		--build-arg VCS_REF=`git -C backend rev-parse HEAD` \
+		backend
+	docker push plots418890/natours-backend:latest
 	docker push "plots418890/natours-backend:${BACKEND_TAG}"
 
 certs:
@@ -31,7 +38,7 @@ backend-logs:
 
 # nginx server log
 access-logs:
-	tail -f api.natours-club.site.access.log	
+	tail -f /var/log/natours-club.site/log/api.natours-club.site.access.log	
 
 # Daily Cron job for renew ssl certs
 # crontab -e 
@@ -46,3 +53,11 @@ ssl-renew:
 		certbot/certbot renew   
 	docker service update --force natours_nginx
 	docker system prune -af 
+
+loadtest:
+	hey \
+	-m get \
+	-c 100 \
+	-n 1000000 \
+	"https://api.natours-club.site/v2/tours/"
+		
